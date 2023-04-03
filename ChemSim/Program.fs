@@ -21,6 +21,13 @@ type Reaction = {
 }
 
 
+type Threshold = {
+    reactant: Reactant;
+    conditional: int -> int -> bool;
+    threshold: int;
+}
+
+
 let prob_helper x c =
     match x < c with
     | true -> 0.0
@@ -46,11 +53,6 @@ let random = System.Random()
 
 
 let select_reaction (probs: (float*Reaction) list) (total_prob: float) =
-    // TODO: choose the next reaction for real
-    //let p, r = probs[0]
-    //match p > 0.0 with 
-    //| true -> Some r
-    //| false -> None
     let target = random.NextDouble()
     select_helper probs total_prob target 0.0
 
@@ -84,13 +86,26 @@ let react reactions quantities =
     | None -> quantities
 
 
-let rec simulate (reactions: Reaction list) (iter: int) (quantities: Map<Reactant, int>) =
-    match iter < 10 with
-    | false -> quantities
-    | true ->
+let rec thresholds_met thresholds (quantities: Map<Reactant, int>) =
+    // returns true once a threshold is met
+    match thresholds with
+    | [] -> false
+    | t::li ->
+        match quantities.TryFind t.reactant with
+        | None -> thresholds_met li quantities
+        | Some q ->
+            match t.conditional q t.threshold with
+            | true -> true
+            | false -> thresholds_met li quantities
+
+
+let rec simulate (reactions: Reaction list) thresholds (quantities: Map<Reactant, int>) (iter: int) =
+    match iter >= 100, thresholds_met thresholds quantities with
+    | true, _ | _, true -> quantities
+    | _, _ ->
         let updated_quantities = react reactions quantities
         printfn "%A" updated_quantities
-        simulate reactions (iter+1) updated_quantities
+        simulate reactions thresholds updated_quantities (iter+1) 
 
 
 let a = Reactant "a"
@@ -99,12 +114,17 @@ let c = Reactant "c"
 
 let reactions = [
     { inputs=[1,a; 1,b]; outputs=[1,c]; rate=1.0; };
+    { inputs=[1,c]; outputs=[1,a; 1,b]; rate=0.1; };
+]
+
+let thresholds = [
+    { reactant=c; conditional=(>=); threshold=90; }
 ]
 
 let quantities = 
     Map.empty.
-        Add(a, 10).
-        Add(b, 10).
+        Add(a, 100).
+        Add(b, 100).
         Add(c, 0)
 
-simulate reactions 0 quantities |> ignore
+simulate reactions thresholds quantities 0 |> ignore
