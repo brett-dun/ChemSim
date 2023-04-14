@@ -100,7 +100,7 @@ let rec thresholds_met thresholds (quantities: Map<Reactant, int>) =
 
 
 let rec simulate (reactions: Reaction list) thresholds (quantities: Map<Reactant, int>) (iter: int) =
-    match iter >= 100, thresholds_met thresholds quantities with
+    match iter >= 1000, thresholds_met thresholds quantities with
     | true, _ | _, true -> quantities
     | _, _ ->
         let updated_quantities = react reactions quantities
@@ -108,23 +108,59 @@ let rec simulate (reactions: Reaction list) thresholds (quantities: Map<Reactant
         simulate reactions thresholds updated_quantities (iter+1) 
 
 
-let a = Reactant "a"
+//let a = Reactant "a"
+//let b = Reactant "b"
+//let c = Reactant "c"
+
+//let reactions = [
+//    { inputs=[1,a; 1,b]; outputs=[1,c]; rate=1.0; };
+//    { inputs=[1,c]; outputs=[1,a; 1,b]; rate=0.1; };
+//]
+
+//let thresholds = [
+//    { reactant=c; conditional=(>=); threshold=90; }
+//]
+
+//let quantities = 
+//    Map.empty.
+//        Add(a, 100).
+//        Add(b, 100).
+//        Add(c, 0)
+
+//simulate reactions thresholds quantities 0 |> ignore
+
+
+// Simulate log function
+// Reactants
 let b = Reactant "b"
+let a = Reactant "a"
+let Y = Reactant "Y"
 let c = Reactant "c"
+let Yp = Reactant "Yp"
+let W = Reactant "W"
+let m = Reactant "m"
 
 let reactions = [
-    { inputs=[1,a; 1,b]; outputs=[1,c]; rate=1.0; };
-    { inputs=[1,c]; outputs=[1,a; 1,b]; rate=0.1; };
+    { inputs=[1,b]; outputs=[1,a; 1,b]; rate=1.0; };
+    { inputs=[1,a; 2,Y]; outputs=[1,c; 1,Yp; 1,a]; rate=1000.0; };
+    { inputs=[2,c]; outputs=[1,c]; rate=1000.0; };
+    { inputs=[1,a]; outputs=[1,W]; rate=100.0; };
+    { inputs=[1,Yp]; outputs=[1,Y]; rate=10.0; };
+    { inputs=[1,c]; outputs=[1,m]; rate=10.0 };
 ]
 
 let thresholds = [
-    { reactant=c; conditional=(>=); threshold=90; }
+    { reactant=Y; conditional=(<=); threshold=1; }
 ]
 
 let quantities = 
     Map.empty.
-        Add(a, 100).
-        Add(b, 100).
-        Add(c, 0)
+        Add(b, 1).
+        Add(a, 1).
+        Add(Y, 32).
+        Add(c, 0).
+        Add(Yp, 0).
+        Add(W, 0).
+        Add(m, 0)
 
 simulate reactions thresholds quantities 0 |> ignore
