@@ -100,11 +100,11 @@ let rec thresholds_met thresholds (quantities: Map<Reactant, int>) =
 
 
 let rec simulate (reactions: Reaction list) thresholds (quantities: Map<Reactant, int>) (iter: int) =
-    match iter >= 1000, thresholds_met thresholds quantities with
+    match iter >= 10000, thresholds_met thresholds quantities with
     | true, _ | _, true -> quantities
     | _, _ ->
         let updated_quantities = react reactions quantities
-        printfn "%A" updated_quantities
+        //printfn "%A" updated_quantities
         simulate reactions thresholds updated_quantities (iter+1) 
 
 
@@ -163,4 +163,6 @@ let quantities =
         Add(W, 0).
         Add(m, 0)
 
-simulate reactions thresholds quantities 0 |> ignore
+let ending_quantities = simulate reactions thresholds quantities 0
+
+printfn "%A" ending_quantities
