@@ -1,7 +1,4 @@
 ﻿
-// WARNING: There are still bugs in this program, likely in the selection process for the next reaction.
-
-
 /// <summary>
 /// Global random object used for the generation of random numbers.
 /// </summary>
@@ -125,7 +122,7 @@ let update_quantities (reaction: Reaction) (quantities: Map<Reactant, uint>) =
 /// </summary>
 let react reactions quantities =
     // calculate the probabilities for each reaction
-    let probs = [for r in reactions -> (calc_prob r quantities),r]
+    let probs = [for r in reactions -> (r.rate * calc_prob r quantities),r]
     // sum the probabilities
     let total_prob = [for p,_ in probs -> p] |> List.reduce (+)
     // select a reaction to run
@@ -173,64 +170,53 @@ let rec simulate (reactions: Reaction list) thresholds (quantities: Map<Reactant
 
 [<EntryPoint>]
 let main argv =
-    //let a = Reactant "a"
-    //let b = Reactant "b"
-    //let c = Reactant "c"
+
+    //let H = Reactant "H"
+    //let O = Reactant "O"
+    //let N = Reactant "N"
+    //let H2 = Reactant "H2"
+    //let O2 = Reactant "O2"
+    //let N2 = Reactant "N2"
 
     //let reactions = [
-    //    { inputs=[1,a; 1,b]; outputs=[1,c]; rate=1.0; };
-    //    { inputs=[1,c]; outputs=[1,a; 1,b]; rate=0.1; };
+    //    { inputs=[2u, H]; outputs=[1u, H2]; rate=10.0; };
+    //    { inputs=[2u, O]; outputs=[1u, O2]; rate=1.0; };
+    //    //{ inputs=[2u, N]; outputs=[1u, N2]; rate=1.0; };
     //]
 
-    //let thresholds = [
-    //    { reactant=c; conditional=(>=); threshold=90; }
-    //]
+    //let thresholds = []
 
-    //let quantities = 
+    //let quantities =
     //    Map.empty.
-    //        Add(a, 100).
-    //        Add(b, 100).
-    //        Add(c, 0)
+    //        Add(H, 1000u).
+    //        Add(O, 1000u).
+    //        Add(N, 1000u).
+    //        Add(H2, 0u).
+    //        Add(O2, 0u).
+    //        Add(N2, 0u)
 
-    //simulate reactions thresholds quantities 0 |> ignore
+    //let iterations = 10000
 
-
-    //// Simulate log function
-    //// Reactants
-    //let b = Reactant "b"
-    //let a = Reactant "a"
-    //let Y = Reactant "Y"  // Input
-    //let c = Reactant "c"  // Output
-    //let Yp = Reactant "Yp"
-    //let W = Reactant "W"
-    //let m = Reactant "m"
-
-    //// Chemical reactions required to implement the log function.
-    //let reactions = [
-    //    { inputs=[1u,b]; outputs=[1u,a; 1u,b]; rate=1.0; };
-    //    { inputs=[1u,a; 2u,Y]; outputs=[1u,c; 1u,Yp; 1u,a]; rate=1000.0; };
-    //    { inputs=[2u,c]; outputs=[1u,c]; rate=1000.0; };
-    //    { inputs=[1u,a]; outputs=[1u,W]; rate=100.0; };
-    //    { inputs=[1u,Yp]; outputs=[1u,Y]; rate=10.0; };
-    //    { inputs=[1u,c]; outputs=[1u,m]; rate=10.0 };
+    //// TODO: this could be parallized (but be careful to handle random number generation in a thread-safe way)
+    //let ending_quantities = [
+    //    for _ in 1..iterations ->
+    //        let q = (simulate reactions thresholds quantities 0u)
+    //        q.Item(H), q.Item(O), q.Item(N), q.Item(H2), q.Item(O2), q.Item(N2)
     //]
 
-    //// Stop the reaction when we run out of the input Y
-    //let thresholds = [
-    //    { reactant=Y; conditional=(<=); threshold=1u; }
-    //]
+    //let count_quantities (a,b,c,d,e,f) (aa, bb, cc, dd, ee, ff) =
+    //    a+aa, b+bb, c+cc, d+dd, e+ee, f+ff
 
-    //// Initial quantities of each reactant.
-    //let quantities = 
-    //    Map.empty.
-    //        Add(b, 1u).
-    //        Add(a, 0u).
-    //        Add(Y, 32u).
-    //        Add(c, 0u).
-    //        Add(Yp, 0u).
-    //        Add(W, 0u).
-    //        Add(m, 0u)
+    //let fiterations = float iterations
 
+    ////printfn "%A" ending_quantities
+    //let h, o, n, h2, o2, n2 = List.reduce count_quantities ending_quantities
+    //(h |> float) / fiterations |> printfn "%f"
+    //(o |> float) / fiterations |> printfn "%f"
+    //(n |> float) / fiterations |> printfn "%f"
+    //(h2 |> float) / fiterations |> printfn "%f"
+    //(o2 |> float) / fiterations |> printfn "%f"
+    //(n2 |> float) / fiterations |> printfn "%f"
 
 
     // Simulate multiplication.
@@ -254,7 +240,7 @@ let main argv =
 
     let quantities = 
         Map.empty.
-            Add(X, 4u).
+            Add(X, 2u).
             Add(a, 0u).
             Add(Y, 5u).
             Add(Yp, 0u).
@@ -267,5 +253,6 @@ let main argv =
 
     //printfn "%A" ending_quantities
     ((List.reduce (+) ending_quantities) |> float) / 100.0 |> printfn "%f"
+
 
     0
