@@ -2,6 +2,12 @@
 
 Stochastic chemical reaction network simulator based off of Professor Marc Riedel's aleae simulation program.
 
+## Usage
+
+Requires .NET 8.0 SDK.
+
+`dotnet run`
+
 ## Related Papers
 
 [Tackling the Stochastic Simulation of Biochemical Networks with Real Computing Power](http://mriedel.ece.umn.edu/wiki/images/4/48/Riedel_Tackling_the_Stochastic_Simulation_of_Biochemical_Networks_with_Real_Computing_Power.pdf)
